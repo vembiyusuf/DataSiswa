@@ -131,3 +131,30 @@ table tr:nth-child(even) {
   background-color: #218838;
   transform: scale(1.05);
 }
+
+/* Tambahkan ini ke dalam file Vembi.css yang sudah ada */
+
+/* Styling untuk logout button */
+.logout-form {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.logout-button {
+  padding: 12px 24px;
+  background-color: #dc3545;
+  /* Merah */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 70%;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+  /* Merah gelap */
+  transform: scale(1.05);
+}

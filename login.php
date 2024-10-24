@@ -15,29 +15,48 @@ if ($conn->connect_error) {
 
 if (isset($_POST['login'])) {
   $username = $_POST['username'];
-  $password = md5($_POST['password']);  // Pastikan password di-hash sama dengan yang ada di database
+  $password = md5($_POST['password']);
+  $role = $_POST['role'];  // Menangkap role yang dipilih
 
-  $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+  // Menambahkan pengecekan role dalam query SQL
+  $sql = "SELECT * FROM users WHERE username='$username' AND password='$password' AND role='$role'";
   $result = $conn->query($sql);
 
   if ($result->num_rows > 0) {
-    // Login berhasil, set session
+    $row = $result->fetch_assoc();
+    // Set session berdasarkan username dan role
     $_SESSION['username'] = $username;
+    $_SESSION['role'] = $row['role'];
 
-    // Redirect dengan animasi loading
-    echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelector('.container').style.display = 'none';
-                document.getElementById('loading').style.display = 'flex';
+    // Cek role user yang dipilih
+    if ($role == 'admin') {
+      // Jika admin, redirect ke halaman admin.php
+      echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  document.querySelector('.container').style.display = 'none';
+                  document.getElementById('loading').style.display = 'flex';
 
-                setTimeout(function() {
-                    window.location.href = 'vembi.php';
-                }, 3000);  // 3 detik
-            });
-        </script>";
+                  setTimeout(function() {
+                      window.location.href = 'admin.php';
+                  }, 2000); 
+              });
+          </script>";
+    } else {
+      // Jika user, redirect ke halaman vembi.php
+      echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  document.querySelector('.container').style.display = 'none';
+                  document.getElementById('loading').style.display = 'flex';
+
+                  setTimeout(function() {
+                      window.location.href = 'vembi.php';
+                  }, 2000); 
+              });
+          </script>";
+    }
   } else {
-    // Jika username atau password salah
-    $error = "Username atau password salah!";
+    // Jika username, password, atau role salah
+    $error = "Username, password, atau role salah!";
   }
 }
 ?>
@@ -61,6 +80,14 @@ if (isset($_POST['login'])) {
     <form action="login.php" method="post" class="auth-form">
       <input type="text" name="username" placeholder="Username" required>
       <input type="password" name="password" placeholder="Password" required>
+
+      <!-- Dropdown untuk memilih role -->
+      <select name="role" required>
+        <option value="">Pilih Role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+
       <button type="submit" name="login">Login</button>
     </form>
     <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>

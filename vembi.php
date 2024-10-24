@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 $servername = "localhost";
 $username = "root";
@@ -11,6 +12,13 @@ if ($conn->connect_error) {
   die("Koneksi gagal: " . $conn->connect_error);
 }
 
+// Memastikan user sudah login
+if (!isset($_SESSION['username'])) {
+  header("Location: login.php");
+  exit;
+}
+
+// Menangani penambahan data
 if (isset($_POST['add'])) {
   $nisn = $_POST['nisn'];
   $nama = $_POST['nama'];
@@ -24,7 +32,7 @@ if (isset($_POST['add'])) {
   }
 }
 
-
+// Menangani pembaruan data
 if (isset($_POST['update'])) {
   $nisn = $_POST['nisn'];
   $nama = $_POST['nama'];
@@ -48,14 +56,17 @@ if (isset($_GET['delete'])) {
   }
 }
 
+// Mengambil data
 $sql = "SELECT * FROM tb_siswa";
 $result = $conn->query($sql);
 
+// Variabel untuk edit
 $nisn_edit = '';
 $nama_edit = '';
 $alamat_edit = '';
 $jurusan_edit = '';
 
+// Mengambil data untuk edit
 if (isset($_GET['edit'])) {
   $nisn = $_GET['edit'];
   $sql = "SELECT * FROM tb_siswa WHERE nisn='$nisn'";
@@ -68,6 +79,13 @@ if (isset($_GET['edit'])) {
     $alamat_edit = $row['alamat'];
     $jurusan_edit = $row['jurusan'];
   }
+}
+
+// Logout functionality
+if (isset($_POST['logout'])) {
+  session_destroy();
+  header("Location: login.php");
+  exit;
 }
 ?>
 
@@ -84,12 +102,13 @@ if (isset($_GET['edit'])) {
 <body>
   <div class="container">
     <h1>Data Table</h1>
+    <h2>Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
 
     <form action="vembi.php" method="post" class="add-form">
-      <input type="hidden" name="nisn" value="<?php echo htmlspecialchars($nisn_edit); ?>" required>
-      <input type="text" name="nama" placeholder="Nama" value="<?php echo htmlspecialchars($nama_edit); ?>" required>
-      <input type="text" name="alamat" placeholder="Alamat" value="<?php echo htmlspecialchars($alamat_edit); ?>" required>
-      <input type="text" name="jurusan" placeholder="Jurusan" value="<?php echo htmlspecialchars($jurusan_edit); ?>" required>
+      <input type="text" name="nisn" placeholder="NISN" value="<?php echo htmlspecialchars($nisn_edit); ?>" required>
+      <input type="text" name="nama" placeholder="NAMA" value="<?php echo htmlspecialchars($nama_edit); ?>" required>
+      <input type="text" name="alamat" placeholder="ALAMAT" value="<?php echo htmlspecialchars($alamat_edit); ?>" required>
+      <input type="text" name="jurusan" placeholder="JURUSAN" value="<?php echo htmlspecialchars($jurusan_edit); ?>" required>
       <?php if ($nisn_edit): ?>
         <button type="submit" name="update">Update</button>
       <?php else: ?>
@@ -129,6 +148,10 @@ if (isset($_GET['edit'])) {
         <?php endif; ?>
       </tbody>
     </table>
+
+    <form action="vembi.php" method="post" class="logout-form">
+      <button type="submit" name="logout" class="logout-button">Logout</button>
+    </form>
   </div>
 </body>
 
